@@ -31,7 +31,7 @@ int indexMinimumPL = -1;
 // To manually manage onTick()
 bool runOnTick = false;
 input int timerIntervalSeconds = 5; // Tick interval (in seconds)
-input int writeFrequencyMin = 60; // Frequency to write to excel (in minutes)
+input int writeFrequencyMin = 1; // Frequency to write to excel (in minutes)
 int loopBeforeWrite = writeFrequencyMin * 60 / 5;
 int initLoopBeforeWrite = 1;
 
@@ -130,7 +130,7 @@ void OnTick() {
 //+------------------------------------------------------------------+
 void OnTimer() {
 
-   // Print("loopBeforeWrite: ",loopBeforeWrite, ", initLoopBeforeWrite: ",initLoopBeforeWrite);
+   Print("loopBeforeWrite: ",loopBeforeWrite, ", initLoopBeforeWrite: ",initLoopBeforeWrite);
 
    if(initLoopBeforeWrite == loopBeforeWrite){
       Print("Reset counter for the next batch...");
@@ -138,11 +138,13 @@ void OnTimer() {
       existingTotalDrawdownPips = 0;
    }
    runOnTick = true;
-   OnTick(); // Call OnTick() function every second
+   OnTick(); // Call OnTick() function every input frequency
+
+   Print("Total Drawdown (Pips): ", totalDrawdownPips, ", existingTotalDrawdownPips: ", existingTotalDrawdownPips);
 
    // Log the Largest drawdownPips and its associated information IF it is the new high
-   if (indexLargestDrawdown != -1 && totalDrawdownPips < existingTotalDrawdownPips) {
-     
+   if (totalDrawdownPips < existingTotalDrawdownPips) {
+      existingTotalDrawdownPips = totalDrawdownPips;
       // Log total drawdown in pips and total profit/loss
       Print("Largest single drawdown (Pips): ", trades[indexLargestDrawdown].drawdownPips, ", Order ID: ", trades[indexLargestDrawdown].orderId, ", Symbol: ", trades[indexLargestDrawdown].symbol, ", P/L: ", trades[indexLargestDrawdown].profitLoss);  
       Print("Smallest single P&L: ", trades[indexMinimumPL].profitLoss, ", Order ID: ", trades[indexMinimumPL].orderId, ", Symbol: ",  trades[indexMinimumPL].symbol, ", Pips: ", trades[indexMinimumPL].drawdownPips);        
@@ -160,7 +162,6 @@ void OnTimer() {
       for (int i = 0; i < ArraySize(trades); i++) {
           existingTrade[i] = trades[i];
       }
-      existingTotalDrawdownPips = totalDrawdownPips;
    }
    initLoopBeforeWrite++;
 }
