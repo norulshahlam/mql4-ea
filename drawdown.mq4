@@ -154,7 +154,7 @@ void OnTimer() {
          // Log total drawdown in pips and total profit/loss
          // Print("Largest single drawdown (Pips): ", trades[indexLargestDrawdown].drawdownPips, ", Order ID: ", trades[indexLargestDrawdown].orderId, ", Symbol: ", trades[indexLargestDrawdown].symbol, ", P/L: ", trades[indexLargestDrawdown].profitLoss);  
          // Print("Smallest single P&L: ", trades[indexMinimumPL].profitLoss, ", Order ID: ", trades[indexMinimumPL].orderId, ", Symbol: ",  trades[indexMinimumPL].symbol, ", Pips: ", trades[indexMinimumPL].drawdownPips);        
-         Print(TimeGMT()+ (timeZoneOffUtc*60*60), " HRS, New highest Total Drawdown (Pips): ", totalDrawdownPips, ", Total Profit/Loss: ", totalProfitLoss);
+         Print(TimeGMT() + (timeZoneOffUtc*60*60), "- New highest Total Drawdown (Pips): ", totalDrawdownPips, ", Total Profit/Loss: ", totalProfitLoss);
          
          // Display information on the chart
          string info = TimeToString(TimeGMT()+ (timeZoneOffUtc*60*60)) + " HRS\nLargest single drawdown (Pips): " + DoubleToStr(trades[indexLargestDrawdown].drawdownPips, 2) + ", Order ID: " + IntegerToString(trades[indexLargestDrawdown].orderId) + ", Symbol: " + trades[indexLargestDrawdown].symbol + ", P/L: " + DoubleToStr(trades[indexLargestDrawdown].profitLoss, 2) + "\nSmallest single P&L: " + DoubleToStr(trades[indexMinimumPL].profitLoss, 2) + ", Order ID: " + IntegerToString(trades[indexMinimumPL].orderId) + ", Symbol: " + trades[indexMinimumPL].symbol + ", Pipd: " + DoubleToStr(trades[indexMinimumPL].drawdownPips, 2) + "\nTotal Drawdown (Pips): " + DoubleToStr(totalDrawdownPips, 2) + ", Total Profit/Loss: " + DoubleToStr(totalProfitLoss, 2);
