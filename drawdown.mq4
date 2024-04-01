@@ -63,6 +63,7 @@ void OnTick() {
    totalProfitLoss = 0;
    totalDrawdownPips = 0;
    indexLargestDrawdown = -1;
+   largestDrawdownPips = 0;
    indexMinimumPL = -1;
    double minPL = DBL_MAX;
       
@@ -137,31 +138,34 @@ void OnTimer() {
       initLoopBeforeWrite = 0;
       existingTotalDrawdownPips = 0;
    }
+
+   Print("Total Drawdown (Pips): ", totalDrawdownPips, ", existingTotalDrawdownPips: ", existingTotalDrawdownPips, ", indexLargestDrawdown: ", indexLargestDrawdown);
+   
+   // Wait indefinitely until runOnTick is true
+    while (!runOnTick) {
+
+      // Log the Largest drawdownPips and its associated information IF it is the new high
+      if (indexLargestDrawdown != -1 && totalDrawdownPips < existingTotalDrawdownPips) {
+         existingTotalDrawdownPips = totalDrawdownPips;
+         // Log total drawdown in pips and total profit/loss
+         Print("Largest single drawdown (Pips): ", trades[indexLargestDrawdown].drawdownPips, ", Order ID: ", trades[indexLargestDrawdown].orderId, ", Symbol: ", trades[indexLargestDrawdown].symbol, ", P/L: ", trades[indexLargestDrawdown].profitLoss);  
+         Print("Smallest single P&L: ", trades[indexMinimumPL].profitLoss, ", Order ID: ", trades[indexMinimumPL].orderId, ", Symbol: ",  trades[indexMinimumPL].symbol, ", Pips: ", trades[indexMinimumPL].drawdownPips);        
+         Print("Total Drawdown (Pips): ", totalDrawdownPips, ", Total Profit/Loss: ", totalProfitLoss);
+         
+         // Display information on the chart
+         string info = "Largest single drawdown (Pips): " + DoubleToStr(trades[indexLargestDrawdown].drawdownPips, 2) + ", Order ID: " + IntegerToString(trades[indexLargestDrawdown].orderId) + ", Symbol: " + trades[indexLargestDrawdown].symbol + ", P/L: " + DoubleToStr(trades[indexLargestDrawdown].profitLoss, 2) + "\nSmallest single P&L: " + DoubleToStr(trades[indexMinimumPL].profitLoss, 2) + ", Order ID: " + IntegerToString(trades[indexMinimumPL].orderId) + ", Symbol: " + trades[indexMinimumPL].symbol + ", Pipd: " + DoubleToStr(trades[indexMinimumPL].drawdownPips, 2) + "\nTotal Drawdown (Pips): " + DoubleToStr(totalDrawdownPips, 2) + ", Total Profit/Loss: " + DoubleToStr(totalProfitLoss, 2);
+      
+         Comment(info);
+      
+         // Resize the destination array to match the size of the source array
+         ArrayResize(existingTrade, ArraySize(trades));
+         
+         // Copy elements from the source array to the destination array. This is to compare the next tick()
+         for (int i = 0; i < ArraySize(trades); i++) {
+            existingTrade[i] = trades[i];
+         }
+      }  
    runOnTick = true;
-   OnTick(); // Call OnTick() function every input frequency
-
-   Print("Total Drawdown (Pips): ", totalDrawdownPips, ", existingTotalDrawdownPips: ", existingTotalDrawdownPips);
-
-   // Log the Largest drawdownPips and its associated information IF it is the new high
-   if (totalDrawdownPips < existingTotalDrawdownPips) {
-      existingTotalDrawdownPips = totalDrawdownPips;
-      // Log total drawdown in pips and total profit/loss
-      Print("Largest single drawdown (Pips): ", trades[indexLargestDrawdown].drawdownPips, ", Order ID: ", trades[indexLargestDrawdown].orderId, ", Symbol: ", trades[indexLargestDrawdown].symbol, ", P/L: ", trades[indexLargestDrawdown].profitLoss);  
-      Print("Smallest single P&L: ", trades[indexMinimumPL].profitLoss, ", Order ID: ", trades[indexMinimumPL].orderId, ", Symbol: ",  trades[indexMinimumPL].symbol, ", Pips: ", trades[indexMinimumPL].drawdownPips);        
-      Print("Total Drawdown (Pips): ", totalDrawdownPips, ", Total Profit/Loss: ", totalProfitLoss);
-      
-      // Display information on the chart
-      string info = "Largest single drawdown (Pips): " + DoubleToStr(trades[indexLargestDrawdown].drawdownPips, 2) + ", Order ID: " + IntegerToString(trades[indexLargestDrawdown].orderId) + ", Symbol: " + trades[indexLargestDrawdown].symbol + ", P/L: " + DoubleToStr(trades[indexLargestDrawdown].profitLoss, 2) + "\nSmallest single P&L: " + DoubleToStr(trades[indexMinimumPL].profitLoss, 2) + ", Order ID: " + IntegerToString(trades[indexMinimumPL].orderId) + ", Symbol: " + trades[indexMinimumPL].symbol + ", Pipd: " + DoubleToStr(trades[indexMinimumPL].drawdownPips, 2) + "\nTotal Drawdown (Pips): " + DoubleToStr(totalDrawdownPips, 2) + ", Total Profit/Loss: " + DoubleToStr(totalProfitLoss, 2);
-    
-      Comment(info);
-     
-      // Resize the destination array to match the size of the source array
-      ArrayResize(existingTrade, ArraySize(trades));
-      
-      // Copy elements from the source array to the destination array. This is to compare the next tick()
-      for (int i = 0; i < ArraySize(trades); i++) {
-          existingTrade[i] = trades[i];
-      }
    }
    initLoopBeforeWrite++;
 }
