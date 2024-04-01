@@ -131,7 +131,7 @@ void OnTick() {
 //+------------------------------------------------------------------+
 void OnTimer() {
 
-   Print("loopBeforeWrite: ",loopBeforeWrite, ", initLoopBeforeWrite: ",initLoopBeforeWrite);
+   // Print("loopBeforeWrite: ",loopBeforeWrite, ", initLoopBeforeWrite: ",initLoopBeforeWrite);
 
    if(initLoopBeforeWrite == loopBeforeWrite){
       Print("Reset counter for the next batch...");
@@ -139,14 +139,13 @@ void OnTimer() {
       existingTotalDrawdownPips = 0;
    }
 
-   Print("Total Drawdown (Pips): ", totalDrawdownPips, ", existingTotalDrawdownPips: ", existingTotalDrawdownPips, ", indexLargestDrawdown: ", indexLargestDrawdown);
-   
    // Wait indefinitely until runOnTick is true
     while (!runOnTick) {
 
       // Log the Largest drawdownPips and its associated information IF it is the new high
       if (indexLargestDrawdown != -1 && totalDrawdownPips < existingTotalDrawdownPips) {
          existingTotalDrawdownPips = totalDrawdownPips;
+
          // Log total drawdown in pips and total profit/loss
          Print("Largest single drawdown (Pips): ", trades[indexLargestDrawdown].drawdownPips, ", Order ID: ", trades[indexLargestDrawdown].orderId, ", Symbol: ", trades[indexLargestDrawdown].symbol, ", P/L: ", trades[indexLargestDrawdown].profitLoss);  
          Print("Smallest single P&L: ", trades[indexMinimumPL].profitLoss, ", Order ID: ", trades[indexMinimumPL].orderId, ", Symbol: ",  trades[indexMinimumPL].symbol, ", Pips: ", trades[indexMinimumPL].drawdownPips);        
@@ -165,7 +164,7 @@ void OnTimer() {
             existingTrade[i] = trades[i];
          }
       }  
-   runOnTick = true;
+      runOnTick = true;
    }
    initLoopBeforeWrite++;
 }
