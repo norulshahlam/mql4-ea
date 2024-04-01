@@ -18,28 +18,33 @@ struct TradeInfo {
 
 // Array to store information about each trade
 TradeInfo trades[]; // Declare trades array without specifying size
+
+// Initialize variables to track smallest drawdownPips, total drawdown, and total profitLoss
+double largestDrawdownPips = DBL_MAX; // Initialize to maximum possible value
 TradeInfo existingTrade[];
 double existingTotalDrawdownPips = 0;
 double totalProfitLoss = 0;
 double totalDrawdownPips = 0;
-
-// Initialize variables to track smallest drawdownPips, total drawdown, and total profitLoss
-double largestDrawdownPips = DBL_MAX; // Initialize to maximum possible value
 int indexLargestDrawdown = -1;
 int indexMinimumPL = -1;
 
 // To manually manage onTick()
 bool runOnTick = false;
+
 input int timerIntervalSeconds = 5; // Tick interval (in seconds)
-input int writeFrequencyMin = 1; // Frequency to write to excel (in minutes)
+input int writeFrequencyMin = 60; // Frequency to write to excel (in minutes)
+input int timeZoneOffUtc = 8; // Default at SGT (+0800)
 int loopBeforeWrite = writeFrequencyMin * 60 / 5;
 int initLoopBeforeWrite = 1;
+
+// Timezone setting
+double timeZoneOffset = TimeGMTOffset()/60/60;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
 int OnInit() {
-    Print("Initializing...");
+    Print("Initializing...timezone offset: ",timeZoneOffset, " hours", ", TimeGMT: ", TimeGMT(), ", TimeLocal: ", TimeLocal());
     EventSetTimer(timerIntervalSeconds); // Set timer to trigger every specified interval
     return INIT_SUCCEEDED;
 }
@@ -147,12 +152,12 @@ void OnTimer() {
          existingTotalDrawdownPips = totalDrawdownPips;
 
          // Log total drawdown in pips and total profit/loss
-         Print("Largest single drawdown (Pips): ", trades[indexLargestDrawdown].drawdownPips, ", Order ID: ", trades[indexLargestDrawdown].orderId, ", Symbol: ", trades[indexLargestDrawdown].symbol, ", P/L: ", trades[indexLargestDrawdown].profitLoss);  
-         Print("Smallest single P&L: ", trades[indexMinimumPL].profitLoss, ", Order ID: ", trades[indexMinimumPL].orderId, ", Symbol: ",  trades[indexMinimumPL].symbol, ", Pips: ", trades[indexMinimumPL].drawdownPips);        
-         Print("Total Drawdown (Pips): ", totalDrawdownPips, ", Total Profit/Loss: ", totalProfitLoss);
+         // Print("Largest single drawdown (Pips): ", trades[indexLargestDrawdown].drawdownPips, ", Order ID: ", trades[indexLargestDrawdown].orderId, ", Symbol: ", trades[indexLargestDrawdown].symbol, ", P/L: ", trades[indexLargestDrawdown].profitLoss);  
+         // Print("Smallest single P&L: ", trades[indexMinimumPL].profitLoss, ", Order ID: ", trades[indexMinimumPL].orderId, ", Symbol: ",  trades[indexMinimumPL].symbol, ", Pips: ", trades[indexMinimumPL].drawdownPips);        
+         Print(TimeGMT()+ (timeZoneOffUtc*60*60), " HRS, New highest Total Drawdown (Pips): ", totalDrawdownPips, ", Total Profit/Loss: ", totalProfitLoss);
          
          // Display information on the chart
-         string info = "Largest single drawdown (Pips): " + DoubleToStr(trades[indexLargestDrawdown].drawdownPips, 2) + ", Order ID: " + IntegerToString(trades[indexLargestDrawdown].orderId) + ", Symbol: " + trades[indexLargestDrawdown].symbol + ", P/L: " + DoubleToStr(trades[indexLargestDrawdown].profitLoss, 2) + "\nSmallest single P&L: " + DoubleToStr(trades[indexMinimumPL].profitLoss, 2) + ", Order ID: " + IntegerToString(trades[indexMinimumPL].orderId) + ", Symbol: " + trades[indexMinimumPL].symbol + ", Pipd: " + DoubleToStr(trades[indexMinimumPL].drawdownPips, 2) + "\nTotal Drawdown (Pips): " + DoubleToStr(totalDrawdownPips, 2) + ", Total Profit/Loss: " + DoubleToStr(totalProfitLoss, 2);
+         string info = TimeToString(TimeGMT()+ (timeZoneOffUtc*60*60)) + " HRS\nLargest single drawdown (Pips): " + DoubleToStr(trades[indexLargestDrawdown].drawdownPips, 2) + ", Order ID: " + IntegerToString(trades[indexLargestDrawdown].orderId) + ", Symbol: " + trades[indexLargestDrawdown].symbol + ", P/L: " + DoubleToStr(trades[indexLargestDrawdown].profitLoss, 2) + "\nSmallest single P&L: " + DoubleToStr(trades[indexMinimumPL].profitLoss, 2) + ", Order ID: " + IntegerToString(trades[indexMinimumPL].orderId) + ", Symbol: " + trades[indexMinimumPL].symbol + ", Pipd: " + DoubleToStr(trades[indexMinimumPL].drawdownPips, 2) + "\nTotal Drawdown (Pips): " + DoubleToStr(totalDrawdownPips, 2) + ", Total Profit/Loss: " + DoubleToStr(totalProfitLoss, 2);
       
          Comment(info);
       
