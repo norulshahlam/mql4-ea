@@ -163,7 +163,7 @@ void OnTimer() {
          for (int i = 0; i < ArraySize(trades); i++) {
             existingTrade[i] = trades[i];
          }
-      }  
+      }
       runOnTick = true;
    }
    initLoopBeforeWrite++;
