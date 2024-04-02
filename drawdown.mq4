@@ -179,22 +179,24 @@ writeToCsv();
 void writeToCsv(){
       
    // Open file for read and write
-   int fileHandleNew = FileOpen("drawdown.csv",FILE_READ | FILE_WRITE | FILE_TXT | FILE_CSV,';');
-   Print("fileHandleNew:", fileHandleNew);
+   int fileHandleNew = FileOpen("drawdown.csv", FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI, ';');
+   Print("fileHandleNew: ", fileHandleNew);
 
    // Check if the file was opened successfully
     if (fileHandleNew != INVALID_HANDLE){
+
+      FileSeek(fileHandleNew, 0, SEEK_END);
 
       // Construct the header line
       string header = "Timestamp;Total Drawdown (Pips);Total Profit/Loss";
       FileWrite(fileHandleNew, header);
 
-      string data = TimeToString(TimeGMT() + (timeZoneOffUtc*60*60)) + ";" + DoubleToStr(totalDrawdownPips, 2) + ";$" + DoubleToStr(totalProfitLoss, 2);
+      string data = TimeToString(TimeGMT() + (timeZoneOffUtc*60*60)) + ";" + DoubleToStr(totalDrawdownPips, 2) + ";" + DoubleToStr(totalProfitLoss, 2)+ "\r\n";
       FileWrite(fileHandleNew, data);
 
       // Close the file
       FileClose(fileHandleNew);
 
-      Print("Write success:", data);
+      Print("Write success: ", data);
     }
 }
