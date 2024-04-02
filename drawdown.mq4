@@ -138,12 +138,11 @@ void OnTick() {
 void OnTimer() {
 
    // Print("loopBeforeWrite: ",loopBeforeWrite, ", initLoopBeforeWrite: ",initLoopBeforeWrite);
-writeToCsv();
    if(initLoopBeforeWrite == loopBeforeWrite){
       Print("Reset counter for the next batch...");
       initLoopBeforeWrite = 0;
       existingTotalDrawdownPips = 0;
-      
+      writeToCsv();
    }
 
    // Wait indefinitely until runOnTick is true
@@ -179,8 +178,7 @@ writeToCsv();
 void writeToCsv(){
       
    // Open file for read and write
-   int fileHandleNew = FileOpen("drawdown.csv", FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI,';');
-   Print("fileHandleNew: ", fileHandleNew);
+   int fileHandleNew = FileOpen("drawdown.csv", FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI,',');
 
    // Check if the file was opened successfully
    if (fileHandleNew != INVALID_HANDLE){
@@ -188,14 +186,11 @@ void writeToCsv(){
       // Move the file pointer to the end of the file
       FileSeek(fileHandleNew, 0, SEEK_END);
 
-      // Check if the file is empty (size == 0)
+      // Init file with header if file is not present
       if (FileTell(fileHandleNew) == 0){
-         
-         // Construct the header line
-         string header = "Timestamp;Total Drawdown (Pips);Total Profit/Loss";
-         
+
          // Write the header line to the file
-         FileWrite(fileHandleNew, header);
+         FileWrite(fileHandleNew, "Timestamp","Total Drawdown (Pips)","Total Profit/Loss");
       }
 
       // Construct the data line
