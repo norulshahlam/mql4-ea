@@ -34,6 +34,7 @@ bool runOnTick = false;
 input int timerIntervalSeconds = 5; // Tick interval (in seconds)
 input int writeFrequencyMin = 60; // Frequency to write to excel (in minutes)
 input int timeZoneOffUtc = 8.00; // Timezoneoffset - Default at SGT (+0800)
+input int offSetDiffProfitLoss = 1; // OffSet Diff for Profit Loss
 int loopBeforeWrite = writeFrequencyMin * 60 / 5;
 int initLoopBeforeWrite = 1;
 
@@ -137,18 +138,19 @@ void OnTick() {
 void OnTimer() {
 
    // Print("loopBeforeWrite: ",loopBeforeWrite, ", initLoopBeforeWrite: ",initLoopBeforeWrite);
-
+writeToCsv();
    if(initLoopBeforeWrite == loopBeforeWrite){
       Print("Reset counter for the next batch...");
       initLoopBeforeWrite = 0;
       existingTotalDrawdownPips = 0;
+      
    }
 
    // Wait indefinitely until runOnTick is true
     while (!runOnTick) {
 
       // Log the Largest drawdownPips and its associated information IF it is the new high
-      if (indexLargestDrawdown != -1 && totalDrawdownPips < existingTotalDrawdownPips) {
+      if (indexLargestDrawdown != -1 && totalDrawdownPips < existingTotalDrawdownPips + offSetDiffProfitLoss) {
          existingTotalDrawdownPips = totalDrawdownPips;
 
          // Log total drawdown in pips and total profit/loss
@@ -172,4 +174,23 @@ void OnTimer() {
       runOnTick = true;
    }
    initLoopBeforeWrite++;
+}
+
+void writeToCsv(){
+   
+string terminalPath = TerminalInfoString(TERMINAL_DATA_PATH);
+string relativePath = "\\MQL4\\Experts\\drawdown.csv"; // Adjust the filename as needed
+string writeToCsvFilePath = terminalPath + relativePath;
+
+Print("FilePath: ", writeToCsvFilePath);
+
+   
+   // Check if the file exists
+   if (!FileIsExist(writeToCsvFilePath)){
+         Print("file doesnt exists..");
+   }
+   if (FileIsExist(writeToCsvFilePath)){
+         Print("file does exists!");
+   }
+   
 }
