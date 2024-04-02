@@ -36,7 +36,7 @@ bool runOnTick = false;
 //| Input parameter                                                  |
 //+------------------------------------------------------------------+
 input int timerIntervalSeconds = 5; // Tick interval (in seconds)
-input int writeFrequencyMin = 30; // Frequency to write to excel (in minutes)
+input int writeFrequencyMin = 1; // Frequency to write to excel (in minutes)
 input int timeZoneOffUtc = 8.00; // Timezoneoffset - Default at SGT (+0800)
 input int offSetDiffProfitLoss = 1; // Offset for Pips difference
 int loopBeforeWrite = writeFrequencyMin * 60 / timerIntervalSeconds; // writeFrequencyMin * 60 / timerIntervalSeconds; 
@@ -147,11 +147,13 @@ void OnTimer() {
    while (!runOnTick) {
 
       if(initLoopBeforeWrite == loopBeforeWrite){
-      Print("Reset counter for the next batch...");
-      initLoopBeforeWrite = 0;
-      existingTotalDrawdownPips = 0;
-      writeToCsv();
-      } 
+         Print("Reset counter for the next batch...");
+         initLoopBeforeWrite = 0;
+         existingTotalDrawdownPips = 0;
+         writeToCsv();
+      }
+
+      Print(initLoopBeforeWrite," - ", loopBeforeWrite);
 
       // Log the Largest drawdownPips and its associated information IF it is the new high
       if (indexLargestDrawdown != -1 && totalDrawdownPips < existingTotalDrawdownPips - offSetDiffProfitLoss) {
@@ -163,7 +165,7 @@ void OnTimer() {
          Print(TimeGMT() + (timeZoneOffUtc*60*60), " - New highest Total Drawdown (Pips): ", totalDrawdownPips, ", Total Profit/Loss: ", totalProfitLoss);
          
          // Display information on the chart
-         string info = TimeToString(TimeGMT() + (timeZoneOffUtc*60*60)) + " HRS\nLargest single drawdown (Pips): " + DoubleToStr(trades[indexLargestDrawdown].drawdownPips, 2) + ", Order ID: " + IntegerToString(trades[indexLargestDrawdown].orderId) + ", Symbol: " + trades[indexLargestDrawdown].symbol + ", P/L: " + DoubleToStr(trades[indexLargestDrawdown].profitLoss, 2) + "\nSmallest single P&L: " + DoubleToStr(trades[indexMinimumPL].profitLoss, 2) + ", Order ID: " + IntegerToString(trades[indexMinimumPL].orderId) + ", Symbol: " + trades[indexMinimumPL].symbol + ", Pipd: " + DoubleToStr(trades[indexMinimumPL].drawdownPips, 2) + "\nTotal Drawdown (Pips): " + DoubleToStr(totalDrawdownPips, 2) + ", Total Profit/Loss: " + DoubleToStr(totalProfitLoss, 2);
+         string info = TimeToString(TimeGMT() + (timeZoneOffUtc*60*60)) + " HRS\nLargest single drawdown (Pips): " + DoubleToStr(trades[indexLargestDrawdown].drawdownPips, 2) + ", Order ID: " + IntegerToString(trades[indexLargestDrawdown].orderId) + ", Symbol: " + trades[indexLargestDrawdown].symbol + ", P/L: " + DoubleToStr(trades[indexLargestDrawdown].profitLoss, 2) + "\nSmallest single P&L: " + DoubleToStr(trades[indexMinimumPL].profitLoss, 2) + ", Order ID: " + IntegerToString(trades[indexMinimumPL].orderId) + ", Symbol: " + trades[indexMinimumPL].symbol + ", Pips: " + DoubleToStr(trades[indexMinimumPL].drawdownPips, 2) + "\nTotal Drawdown (Pips): " + DoubleToStr(totalDrawdownPips, 2) + ", Total Profit/Loss: " + DoubleToStr(totalProfitLoss, 2);
       
          Comment(info);
       
@@ -175,9 +177,9 @@ void OnTimer() {
             existingTrade[i] = trades[i];
          }
       }
-      runOnTick = true;
-   }
+   runOnTick = true;
    initLoopBeforeWrite++;
+   }
 }
 
 void writeToCsv(){
@@ -195,10 +197,10 @@ void writeToCsv(){
       if (FileTell(fileHandleNew) == 0){
 
          // Write the header line to the file
-         FileWrite(fileHandleNew, "Timestamp","Total Drawdown (Pips)","Total Profit/Loss","Largest single drawdown (Pips)");
+         FileWrite(fileHandleNew, "Timestamp","Total Drawdown (Pips)","Total Profit/Loss","Largest single drawdown (Pips)", "Order ID", "Symbol", "P/L", "Smallest single P&L", "Order ID", "Symbol", "Pips");
       }
       // Write the data line to the file
-      FileWrite(fileHandleNew, TimeToString(TimeGMT() + (timeZoneOffUtc*60*60), TIME_DATE | TIME_SECONDS), DoubleToStr(totalDrawdownPips, 2),DoubleToStr(totalProfitLoss, 2), DoubleToStr(trades[indexLargestDrawdown].drawdownPips, 2));
+      FileWrite(fileHandleNew, TimeToString(TimeGMT() + (timeZoneOffUtc*60*60), TIME_DATE | TIME_SECONDS), DoubleToStr(totalDrawdownPips, 2),DoubleToStr(totalProfitLoss, 2), DoubleToStr(trades[indexLargestDrawdown].drawdownPips, 2), IntegerToString(trades[indexLargestDrawdown].orderId), trades[indexLargestDrawdown].symbol, DoubleToStr(trades[indexLargestDrawdown].profitLoss, 2), DoubleToStr(trades[indexMinimumPL].profitLoss, 2), IntegerToString(trades[indexMinimumPL].orderId), trades[indexMinimumPL].symbol, DoubleToStr(trades[indexMinimumPL].drawdownPips, 2));
    
       // Close the file
       FileClose(fileHandleNew);
