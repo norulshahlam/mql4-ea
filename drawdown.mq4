@@ -150,7 +150,7 @@ writeToCsv();
     while (!runOnTick) {
 
       // Log the Largest drawdownPips and its associated information IF it is the new high
-      if (indexLargestDrawdown != -1 && totalDrawdownPips < existingTotalDrawdownPips + offSetDiffProfitLoss) {
+      if (indexLargestDrawdown != -1 && totalDrawdownPips < existingTotalDrawdownPips - offSetDiffProfitLoss) {
          existingTotalDrawdownPips = totalDrawdownPips;
 
          // Log total drawdown in pips and total profit/loss
@@ -179,17 +179,16 @@ writeToCsv();
 void writeToCsv(){
    
 string terminalPath = TerminalInfoString(TERMINAL_DATA_PATH);
-string relativePath = "\\MQL4\\Experts\\drawdown.csv"; // Adjust the filename as needed
+string relativePath = "\\MQL4\\Files\\drawdown.csv"; // Adjust the filename as needed
 string writeToCsvFilePath = terminalPath + relativePath;
 
 Print("FilePath: ", writeToCsvFilePath);
-
    
    // Check if the file exists
-   if (!FileIsExist(writeToCsvFilePath)){
+   if (!FileIsExist(writeToCsvFilePath,TERMINAL_DATA_PATH)){
          Print("file doesnt exists..");
    }
-   if (FileIsExist(writeToCsvFilePath)){
+   if (FileIsExist(writeToCsvFilePath,TERMINAL_DATA_PATH)){
          Print("file does exists!");
    }
    
