@@ -193,15 +193,15 @@ void writeToCsv(){
          FileWrite(fileHandleNew, "Timestamp","Total Drawdown (Pips)","Total Profit/Loss");
       }
 
-      // Construct the data line
-      string data = TimeToString(TimeGMT() + (timeZoneOffUtc*60*60)) + ";" + DoubleToStr(totalDrawdownPips, 2) + ";" + DoubleToStr(totalProfitLoss, 2);
-      
       // Write the data line to the file
       FileWrite(fileHandleNew, TimeToString(TimeGMT() + (timeZoneOffUtc*60*60), TIME_DATE | TIME_SECONDS), DoubleToStr(totalDrawdownPips, 2),DoubleToStr(totalProfitLoss, 2));
 
       // Close the file
       FileClose(fileHandleNew);
 
-      Print("Write success: ", TimeCurrent(), TimeGMT());
+      Print("Write success!");
+   }
+   else{
+      Print("Fail to read or init file!");
    }
 }
