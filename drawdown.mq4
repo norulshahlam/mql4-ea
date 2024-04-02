@@ -31,11 +31,15 @@ int indexMinimumPL = -1;
 // To manually manage onTick()
 bool runOnTick = false;
 
+
+//+------------------------------------------------------------------+
+//| Input parameter                                                  |
+//+------------------------------------------------------------------+
 input int timerIntervalSeconds = 5; // Tick interval (in seconds)
-input int writeFrequencyMin = 60; // Frequency to write to excel (in minutes)
+input int writeFrequencyMin = 30; // Frequency to write to excel (in minutes)
 input int timeZoneOffUtc = 8.00; // Timezoneoffset - Default at SGT (+0800)
-input int offSetDiffProfitLoss = 1; // OffSet Diff for Profit Loss
-int loopBeforeWrite = writeFrequencyMin * 60 / 5;
+input int offSetDiffProfitLoss = 1; // Offset for Pips difference
+int loopBeforeWrite = writeFrequencyMin * 60 / timerIntervalSeconds; // writeFrequencyMin * 60 / timerIntervalSeconds; 
 int initLoopBeforeWrite = 1;
 
 // Timezone setting
@@ -138,15 +142,16 @@ void OnTick() {
 void OnTimer() {
 
    // Print("loopBeforeWrite: ",loopBeforeWrite, ", initLoopBeforeWrite: ",initLoopBeforeWrite);
-   if(initLoopBeforeWrite == loopBeforeWrite){
+
+   // Wait indefinitely until runOnTick is true
+   while (!runOnTick) {
+
+      if(initLoopBeforeWrite == loopBeforeWrite){
       Print("Reset counter for the next batch...");
       initLoopBeforeWrite = 0;
       existingTotalDrawdownPips = 0;
       writeToCsv();
-   }
-
-   // Wait indefinitely until runOnTick is true
-    while (!runOnTick) {
+      } 
 
       // Log the Largest drawdownPips and its associated information IF it is the new high
       if (indexLargestDrawdown != -1 && totalDrawdownPips < existingTotalDrawdownPips - offSetDiffProfitLoss) {
@@ -190,18 +195,16 @@ void writeToCsv(){
       if (FileTell(fileHandleNew) == 0){
 
          // Write the header line to the file
-         FileWrite(fileHandleNew, "Timestamp","Total Drawdown (Pips)","Total Profit/Loss");
+         FileWrite(fileHandleNew, "Timestamp","Total Drawdown (Pips)","Total Profit/Loss","Largest single drawdown (Pips)");
       }
-
       // Write the data line to the file
-      FileWrite(fileHandleNew, TimeToString(TimeGMT() + (timeZoneOffUtc*60*60), TIME_DATE | TIME_SECONDS), DoubleToStr(totalDrawdownPips, 2),DoubleToStr(totalProfitLoss, 2));
-
+      FileWrite(fileHandleNew, TimeToString(TimeGMT() + (timeZoneOffUtc*60*60), TIME_DATE | TIME_SECONDS), DoubleToStr(totalDrawdownPips, 2),DoubleToStr(totalProfitLoss, 2), DoubleToStr(trades[indexLargestDrawdown].drawdownPips, 2));
+   
       // Close the file
       FileClose(fileHandleNew);
 
       Print("Write success!");
+      return;
    }
-   else{
-      Print("Fail to read or init file!");
-   }
+   Print("Fail to read or init file!");
 }
