@@ -179,24 +179,34 @@ writeToCsv();
 void writeToCsv(){
       
    // Open file for read and write
-   int fileHandleNew = FileOpen("drawdown.csv", FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI, ';');
+   int fileHandleNew = FileOpen("drawdown.csv", FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI,';');
    Print("fileHandleNew: ", fileHandleNew);
 
    // Check if the file was opened successfully
-    if (fileHandleNew != INVALID_HANDLE){
-
+   if (fileHandleNew != INVALID_HANDLE){
+      
+      // Move the file pointer to the end of the file
       FileSeek(fileHandleNew, 0, SEEK_END);
 
-      // Construct the header line
-      string header = "Timestamp;Total Drawdown (Pips);Total Profit/Loss";
-      FileWrite(fileHandleNew, header);
+      // Check if the file is empty (size == 0)
+      if (FileTell(fileHandleNew) == 0){
+         
+         // Construct the header line
+         string header = "Timestamp;Total Drawdown (Pips);Total Profit/Loss";
+         
+         // Write the header line to the file
+         FileWrite(fileHandleNew, header);
+      }
 
-      string data = TimeToString(TimeGMT() + (timeZoneOffUtc*60*60)) + ";" + DoubleToStr(totalDrawdownPips, 2) + ";" + DoubleToStr(totalProfitLoss, 2)+ "\r\n";
-      FileWrite(fileHandleNew, data);
+      // Construct the data line
+      string data = TimeToString(TimeGMT() + (timeZoneOffUtc*60*60)) + ";" + DoubleToStr(totalDrawdownPips, 2) + ";" + DoubleToStr(totalProfitLoss, 2);
+      
+      // Write the data line to the file
+      FileWrite(fileHandleNew, TimeToString(TimeGMT() + (timeZoneOffUtc*60*60), TIME_DATE | TIME_SECONDS), DoubleToStr(totalDrawdownPips, 2),DoubleToStr(totalProfitLoss, 2));
 
       // Close the file
       FileClose(fileHandleNew);
 
-      Print("Write success: ", data);
-    }
+      Print("Write success: ", TimeCurrent(), TimeGMT());
+   }
 }
