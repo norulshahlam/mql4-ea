@@ -159,7 +159,7 @@ writeToCsv();
          Print(TimeGMT() + (timeZoneOffUtc*60*60), " - New highest Total Drawdown (Pips): ", totalDrawdownPips, ", Total Profit/Loss: ", totalProfitLoss);
          
          // Display information on the chart
-         string info = TimeToString(TimeGMT()+ (timeZoneOffUtc*60*60)) + " HRS\nLargest single drawdown (Pips): " + DoubleToStr(trades[indexLargestDrawdown].drawdownPips, 2) + ", Order ID: " + IntegerToString(trades[indexLargestDrawdown].orderId) + ", Symbol: " + trades[indexLargestDrawdown].symbol + ", P/L: " + DoubleToStr(trades[indexLargestDrawdown].profitLoss, 2) + "\nSmallest single P&L: " + DoubleToStr(trades[indexMinimumPL].profitLoss, 2) + ", Order ID: " + IntegerToString(trades[indexMinimumPL].orderId) + ", Symbol: " + trades[indexMinimumPL].symbol + ", Pipd: " + DoubleToStr(trades[indexMinimumPL].drawdownPips, 2) + "\nTotal Drawdown (Pips): " + DoubleToStr(totalDrawdownPips, 2) + ", Total Profit/Loss: " + DoubleToStr(totalProfitLoss, 2);
+         string info = TimeToString(TimeGMT() + (timeZoneOffUtc*60*60)) + " HRS\nLargest single drawdown (Pips): " + DoubleToStr(trades[indexLargestDrawdown].drawdownPips, 2) + ", Order ID: " + IntegerToString(trades[indexLargestDrawdown].orderId) + ", Symbol: " + trades[indexLargestDrawdown].symbol + ", P/L: " + DoubleToStr(trades[indexLargestDrawdown].profitLoss, 2) + "\nSmallest single P&L: " + DoubleToStr(trades[indexMinimumPL].profitLoss, 2) + ", Order ID: " + IntegerToString(trades[indexMinimumPL].orderId) + ", Symbol: " + trades[indexMinimumPL].symbol + ", Pipd: " + DoubleToStr(trades[indexMinimumPL].drawdownPips, 2) + "\nTotal Drawdown (Pips): " + DoubleToStr(totalDrawdownPips, 2) + ", Total Profit/Loss: " + DoubleToStr(totalProfitLoss, 2);
       
          Comment(info);
       
@@ -177,19 +177,24 @@ writeToCsv();
 }
 
 void writeToCsv(){
-   
-string terminalPath = TerminalInfoString(TERMINAL_DATA_PATH);
-string relativePath = "\\MQL4\\Files\\drawdown.csv"; // Adjust the filename as needed
-string writeToCsvFilePath = terminalPath + relativePath;
+      
+   // Open file for read and write
+   int fileHandleNew = FileOpen("drawdown.csv",FILE_READ | FILE_WRITE | FILE_TXT | FILE_CSV,';');
+   Print("fileHandleNew:", fileHandleNew);
 
-Print("FilePath: ", writeToCsvFilePath);
-   
-   // Check if the file exists
-   if (!FileIsExist(writeToCsvFilePath,TERMINAL_DATA_PATH)){
-         Print("file doesnt exists..");
-   }
-   if (FileIsExist(writeToCsvFilePath,TERMINAL_DATA_PATH)){
-         Print("file does exists!");
-   }
-   
+   // Check if the file was opened successfully
+    if (fileHandleNew != INVALID_HANDLE){
+
+      // Construct the header line
+      string header = "Timestamp;Total Drawdown (Pips);Total Profit/Loss";
+      FileWrite(fileHandleNew, header);
+
+      string data = TimeToString(TimeGMT() + (timeZoneOffUtc*60*60)) + ";" + DoubleToStr(totalDrawdownPips, 2) + ";$" + DoubleToStr(totalProfitLoss, 2);
+      FileWrite(fileHandleNew, data);
+
+      // Close the file
+      FileClose(fileHandleNew);
+
+      Print("Write success:", data);
+    }
 }
