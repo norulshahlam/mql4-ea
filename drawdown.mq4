@@ -153,8 +153,6 @@ void OnTimer() {
          writeToCsv();
       }
 
-      Print(initLoopBeforeWrite," - ", loopBeforeWrite);
-
       // Log the Largest drawdownPips and its associated information IF it is the new high
       if (indexLargestDrawdown != -1 && totalDrawdownPips < existingTotalDrawdownPips - offSetDiffProfitLoss) {
          existingTotalDrawdownPips = totalDrawdownPips;
@@ -197,10 +195,10 @@ void writeToCsv(){
       if (FileTell(fileHandleNew) == 0){
 
          // Write the header line to the file
-         FileWrite(fileHandleNew, "Timestamp","Total Drawdown (Pips)","Total Profit/Loss","Largest single drawdown (Pips)", "Order ID", "Symbol", "P/L", "Smallest single P&L", "Order ID", "Symbol", "Pips");
+         FileWrite(fileHandleNew, "Timestamp","Total trades", "Total Drawdown (Pips)","Total Profit/Loss","Largest single drawdown (Pips)", "Order ID", "Symbol", "P/L", "Smallest single P&L", "Order ID", "Symbol", "Pips");
       }
       // Write the data line to the file
-      FileWrite(fileHandleNew, TimeToString(TimeGMT() + (timeZoneOffUtc*60*60), TIME_DATE | TIME_SECONDS), DoubleToStr(totalDrawdownPips, 2),DoubleToStr(totalProfitLoss, 2), DoubleToStr(trades[indexLargestDrawdown].drawdownPips, 2), IntegerToString(trades[indexLargestDrawdown].orderId), trades[indexLargestDrawdown].symbol, DoubleToStr(trades[indexLargestDrawdown].profitLoss, 2), DoubleToStr(trades[indexMinimumPL].profitLoss, 2), IntegerToString(trades[indexMinimumPL].orderId), trades[indexMinimumPL].symbol, DoubleToStr(trades[indexMinimumPL].drawdownPips, 2));
+      FileWrite(fileHandleNew, TimeToString(TimeGMT() + (timeZoneOffUtc*60*60), TIME_DATE | TIME_SECONDS), ArraySize(trades) ,DoubleToStr(totalDrawdownPips, 2),DoubleToStr(totalProfitLoss, 2), DoubleToStr(trades[indexLargestDrawdown].drawdownPips, 2), IntegerToString(trades[indexLargestDrawdown].orderId), trades[indexLargestDrawdown].symbol, DoubleToStr(trades[indexLargestDrawdown].profitLoss, 2), DoubleToStr(trades[indexMinimumPL].profitLoss, 2), IntegerToString(trades[indexMinimumPL].orderId), trades[indexMinimumPL].symbol, DoubleToStr(trades[indexMinimumPL].drawdownPips, 2));
    
       // Close the file
       FileClose(fileHandleNew);
