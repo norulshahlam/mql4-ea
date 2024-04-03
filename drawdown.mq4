@@ -36,11 +36,11 @@ bool runOnTick = false;
 //| Input parameter                                                  |
 //+------------------------------------------------------------------+
 input int timerIntervalSeconds = 5; // Tick interval (in seconds)
-input int writeFrequencyMin = 1; // Frequency to write to excel (in minutes)
+input int writeFrequencyMin = 15; // Frequency to write to excel (in minutes)
 input int timeZoneOffUtc = 8.00; // Timezoneoffset - Default at SGT (+0800)
-input int offSetDiffProfitLoss = 1; // Offset for Pips difference
+input int offSetDiffProfitLoss = 5; // Offset for Pips difference
 int loopBeforeWrite = writeFrequencyMin * 60 / timerIntervalSeconds; // writeFrequencyMin * 60 / timerIntervalSeconds; 
-int initLoopBeforeWrite = 1;
+int initLoopBeforeWrite = 0;
 
 // Timezone setting
 double timeZoneOffset = TimeGMTOffset()/60/60;
